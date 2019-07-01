@@ -1,0 +1,70 @@
+<html>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<style>
+.left{
+	float:left;
+}
+</style>
+<div>
+	<div id="mainSec" class="container">
+	<form>
+		<fieldset class="left w-100 mb-2">
+			<input type="text" placeholder="Filter posts by keyword" v-model="search" class="w-100"/>
+		</fieldset> 
+	</form>
+	<div v-for="post in filteredPosts" class="mt-2">
+		<img src="https://via.placeholder.com/120" class="rounded-circle w-5 left">
+			<div v-for="result in results" v-if="post.userId == result.id" class="left ml-3 mt-4" > 
+				<p class="mb-0">{{result.name}}</p>
+				<p class="mb-0">{{result.email}} | {{result.address.city}}</p>
+			</div>	
+			<p class="left w-100"><strong>{{post.title.toUpperCase()}}</strong></p>
+			<p class="left w-100">{{post.body}}</p>
+		</div>	
+	</div>
+</div>
+</html>
+<script>
+const urlUsers = "https://jsonplaceholder.typicode.com/users";
+const urlPosts = "https://jsonplaceholder.typicode.com/posts";
+var  vm = new Vue({
+    el: '#mainSec',
+    data() {
+        return {
+			search : '',
+            results : [],
+			posts : []
+        };
+	},
+    async created() {
+			try{
+				axios.get(urlUsers).then(response => {
+					this.results = response.data
+				});
+				axios.get(urlPosts).then(response => {
+					this.posts = response.data
+				});
+				
+			}
+			catch(error){
+				console.log("Error is " + error);
+			}
+          
+    },
+	computed : {
+		filteredPosts (){
+			if(this.search){
+				return this.posts.filter((item)=>{
+					return item.title.match(this.search);
+				})
+			}else{
+				return this.posts;
+			}
+		}
+	}
+})
+</script>
